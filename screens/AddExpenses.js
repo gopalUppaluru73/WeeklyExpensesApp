@@ -1,43 +1,86 @@
-import React, { useReducer, useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import React, { useReducer } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 
-const initialState = [];
+const initialState = {
+  description: '',
+};
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'ADD_EXPENSE':
-      return [...state, action.payload];
+    case 'SET_DESCRIPTION':
+      return { ...state, description: action.payload };
+    case 'RESET_DESCRIPTION':
+      return { ...state, description: '' };
     default:
       return state;
   }
 };
 
-const AddExpenses = ({ onAdd, onCancel }) => {
+const AddExpenses = ({ onAddExpense }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [expense, setExpense] = useState('');
+
+  const handleAdd = () => {
+    onAddExpense({ description: state.description });
+    dispatch({ type: 'RESET_DESCRIPTION' });
+  };
+
+  const handleCancel = () => {
+    dispatch({ type: 'RESET_DESCRIPTION' });
+  };
 
   return (
-    <View style={styles.container}>
-      <TextInput
+    <View style={styles.addExpenses}>
+      <TextInput 
         style={styles.input}
-        onChangeText={setExpense}
-        value={expense}
-        placeholder="Enter Expense Entry"
+        placeholder="Description"
+        value={state.description}
+        onChangeText={text => dispatch({ type: 'SET_DESCRIPTION', payload: text })}
       />
-      <Button title="ADD" onPress={() => dispatch({ type: 'ADD_EXPENSE', payload: expense })} />
-      <Button title="Cancel" onPress={onCancel} />
+       <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', borderBottomWidth: 5, borderColor: 'black', width: '80%', paddingBottom: 20 }}>
+          <TouchableOpacity style={styles.button}  onPress={handleAdd}>
+            <Text style={styles.buttonText}>ADD</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button}  onPress={handleCancel}>
+            <Text style={styles.buttonText}>CANCEL</Text>
+          </TouchableOpacity>
+        </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    // Styles for your container
+  addExpenses: {
+    padding: 10,
+    marginTop: 90,
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  button: {
+    margin: 10,
+    padding: 20,
+    backgroundColor: 'blue',
+    borderRadius: 15,
+    width: 120,
+    marginTop: 40,
+    borderColor: 'black',
+    borderWidth: 3
+  },
+  buttonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold'
   },
   input: {
-    // Styles for your TextInput
+    borderWidth: 2,
+    borderColor: 'red',
+    padding: 20,
+    borderRadius: 10,
+    width: 200,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontSize: 18,
   },
-  // Add other styles if needed
 });
 
 export default AddExpenses;
